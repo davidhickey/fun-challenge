@@ -1,40 +1,55 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import TokenSwapCard from "../TokenSwapCard";
-import { useTokenData, useTokenPriceData } from "@/components/hooks/useTokenSwapAPI";
+import { useCallback, useState } from "react";
+import { debounce } from "@/lib/utils";
 
+export type SupportedTokens = "USDC" | "ETH" | "USDT" | "WBTC";
 
+export const SUPPORTED_TOKENS_DATA = {
+  "USDC": {
+    "chainId": "1",
+  },
+  "ETH": {
+    "chainId": "8453",
+  },
+  "USDT": {
+    "chainId": "137",
+  },
+  "WBTC": {
+    "chainId": "1",
+  }
+}
 const TokenSwapMain = () => {
+  const [sellUsdAmount, setSellUsdAmount] = useState<string>("");
 
-  const { tokenData, isTokenLoading, tokenError } = useTokenData({ chainId: "1", symbol: "ETH" });
-  const { tokenPriceData, isTokenPriceLoading, tokenPriceError } = useTokenPriceData({ chainId: "1", assetTokenAddress: "0x0000000000000000000000000000000000000000" });
-
-  console.log("tokenData", tokenData);
-  console.log("tokenPriceData", tokenPriceData);
-  console.log("isTokenLoading", isTokenLoading);
-  console.log("isTokenPriceLoading", isTokenPriceLoading);
-  console.log("tokenError", tokenError);
-  console.log("tokenPriceError", tokenPriceError);
+  const debouncedSetSellUsdAmount = useCallback(
+    debounce((...args: unknown[]) => {
+      setSellUsdAmount(args[0] as string);
+    }, 300),
+    []
+  );
 
   return (
-    <div className="token-swap-main-container">
+    <div className="token-swap-main-container w-full lg:max-w-[60rem]">
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Token Price Explorer</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="token-swap-content flex flex-col md:flex-row gap-4">
-            <TokenSwapCard
-              title="Buy"
-              fieldTitle="Buy Token"
-              type="buy"
-              tokens={["Token 1", "Token 2"]}
-            />
+          <div className="token-swap-content flex flex-col lg:flex-row w-full gap-4">
             <TokenSwapCard
               title="Sell"
-              fieldTitle="Sell Token"
+              showInput={true}
               type="sell"
-              tokens={["Token 1", "Token 2"]}
+              usdAmount={sellUsdAmount}
+              onSellUsdAmount={debouncedSetSellUsdAmount}
+            />
+            <TokenSwapCard
+              title="Buy"
+              showInput={false}
+              type="buy"
+              usdAmount={sellUsdAmount}
             />
           </div>
         </CardContent>

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { GetAssetPriceInfoResponse } from "@funkit/api-base";
 
 const fetchTokenData = async ({ chainId, symbol }: { chainId: string, symbol: string }) => {
+  console.log('fetchTokenData', chainId, symbol);
   const req = await fetch(`/api/token-swap?reqType=erc20&chainId=${chainId}&symbol=${symbol}`);
   if (!req.ok) {
     throw new Error(`Failed to fetch token data on request. Server response: ${req.status} ${req.statusText}`);
@@ -27,7 +28,7 @@ const fetchTokenPriceData = async ({ chainId, assetTokenAddress }: { chainId: st
 
 const useTokenData = ({ chainId, symbol }: { chainId: string, symbol: string }) => {
   const { data: tokenData, isLoading: isTokenLoading, error: tokenError } = useQuery({
-    queryKey: ["token-swap"],
+    queryKey: ["token-swap", chainId, symbol],
     queryFn: () => fetchTokenData({ chainId, symbol }),
   });
   return { tokenData, isTokenLoading, tokenError };
@@ -35,8 +36,9 @@ const useTokenData = ({ chainId, symbol }: { chainId: string, symbol: string }) 
 
 const useTokenPriceData = ({ chainId, assetTokenAddress }: { chainId: string, assetTokenAddress: string }) => {
   const { data: tokenPriceData, isLoading: isTokenPriceLoading, error: tokenPriceError } = useQuery({
-    queryKey: ["token-price"],
+    queryKey: ["token-price", chainId, assetTokenAddress],
     queryFn: () => fetchTokenPriceData({ chainId, assetTokenAddress }),
+    staleTime: 0 //always fetch new data
   });
   return { tokenPriceData, isTokenPriceLoading, tokenPriceError };
 };
