@@ -24,7 +24,7 @@ const TokenSwapCard = ({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        {fieldTitle}
+        {fieldTitle && <span className="text-sm">{fieldTitle}</span>}
         <div className="flex flex-col md:flex-row gap-2 align-start justify-start">
           <Input placeholder="Amount" />
           <DropdownMenu>
