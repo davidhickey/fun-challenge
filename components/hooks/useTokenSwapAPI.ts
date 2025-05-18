@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { GetAssetPriceInfoResponse } from "@funkit/api-base";
 
 const fetchTokenData = async ({ chainId, symbol }: { chainId: string, symbol: string }) => {
-  console.log('fetchTokenData', chainId, symbol);
   const req = await fetch(`/api/token-swap?reqType=erc20&chainId=${chainId}&symbol=${symbol}`);
   if (!req.ok) {
     throw new Error(`Failed to fetch token data on request. Server response: ${req.status} ${req.statusText}`);
