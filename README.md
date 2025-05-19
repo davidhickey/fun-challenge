@@ -2,6 +2,10 @@
 
 A modern web application for token swapping built with Next.js, React, and TypeScript.
 
+## Deployed Site
+
+https://fun-challenge-chi.vercel.app/
+
 ## Design Choices
 
 - using Uniswap UI as a reference for the design
