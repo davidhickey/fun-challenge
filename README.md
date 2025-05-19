@@ -6,10 +6,10 @@ A modern web application for token swapping built with Next.js, React, and TypeS
 
 - using Uniswap UI as a reference for the design
 - maintaining a seperation of concerns between the frontend and the backend by using React custom hooks and Next.js API routes to fetch data from the Funkit API.
-- leveraging tanstack query for state management and caching of data
-- utilizing shadcn ui for the design system instead of handrolling components
-- using a debounce function to prevent unnecessary re-renders and API calls when the user is typing in the input field
-- error and validation states for failed API calls and invalid input
+- leveraging tanstack query for state management and caching of data to prevent unnecessary re-renders and API calls
+- utilizing shadcn ui for the design system instead of handrolling components to save time
+- using a debounce function to prevent unnecessary API calls when the user is typing in the input field
+- error and validation states for failed API calls and invalid input to improve the user experience
 
 ## If I had more time...
 
