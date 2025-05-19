@@ -33,16 +33,18 @@ const TokenSwapCard = ({
 }) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [selectedToken, setSelectedToken] = useState<SupportedTokens>("USDC");
+  const [validationError, setValidationError] = useState<string>("");
   const [showError, setShowError] = useState<boolean>(false);
 
   const { tokenData, tokenError, isTokenLoading } = useTokenData({
     chainId: SUPPORTED_TOKENS_DATA[selectedToken].chainId,
     symbol: selectedToken,
   });
+
   const { tokenPriceData, tokenPriceError, isTokenPriceLoading } =
     useTokenPriceData({
       chainId: SUPPORTED_TOKENS_DATA[selectedToken].chainId,
-      assetTokenAddress: tokenData?.address,
+      assetTokenAddress: tokenData?.address || "",
     });
 
 
@@ -58,6 +60,12 @@ const TokenSwapCard = ({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValidationError("");
+    //check if the input value is a number
+    if (!/^\d*\.?\d*$/.test(e.target.value)) {
+      setValidationError("Input must be number.");
+      return;
+    }
     setInputValue(e.target.value);
     if (onSellUsdAmount) {
       onSellUsdAmount(e.target.value);
@@ -76,7 +84,7 @@ const TokenSwapCard = ({
   }, [tokenError, tokenPriceError]);
 
   return (
-    <Card className={`${type}-card-container w-full py-10 lg:w-1/2`}>
+    <Card className={`${type}-card-container w-full lg:w-1/2`}>
       <CardHeader>
         <CardTitle>
           <div className="flex flex-col gap-2 w-full items-start md:flex-row md:items-center">
@@ -85,7 +93,7 @@ const TokenSwapCard = ({
               {showInput && (
                 <div className="flex flex-col gap-2">
                   {inputTitle && <span className="text-sm">{inputTitle}</span>}
-                  <div className="flex flex-row gap-2 items-center">
+                  <div className="flex flex-row gap-2 items-center relative">
                     <span className="text-sm">$</span>
                     <Input
                       placeholder="0"
@@ -93,6 +101,7 @@ const TokenSwapCard = ({
                       onChange={handleInputChange}
                       className="w-[6rem]"
                     />
+                    {validationError && <span className="text-xs font-normal text-red-500 h-0 absolute animate-pulse left-[1rem] bottom-[-.25rem] w-full">{validationError}</span>}
                     <span>of</span>
                   </div>
                 </div>
