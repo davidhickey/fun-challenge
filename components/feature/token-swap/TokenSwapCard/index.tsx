@@ -8,8 +8,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { useMemo, useState } from "react";
-import { SupportedTokens, SUPPORTED_TOKENS_DATA } from "../TokenSwapMain";
+import { useEffect, useMemo, useState } from "react";
+import { SupportedTokens } from "@/lib/feature/token-swap/types";
+import { SUPPORTED_TOKENS_DATA } from "@/lib/feature/token-swap/constants";
 import {
   useTokenData,
   useTokenPriceData,
@@ -21,23 +22,24 @@ const TokenSwapCard = ({
   inputTitle,
   type,
   onSellUsdAmount,
-  usdAmount,
+  sellUsdAmount,
 }: {
   title: string;
   showInput: boolean;
   inputTitle?: string;
   type: string;
-  usdAmount: string;
+  sellUsdAmount: string;
   onSellUsdAmount?: (value: string) => void | (() => void) | undefined;
 }) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [selectedToken, setSelectedToken] = useState<SupportedTokens>("USDC");
+  const [showError, setShowError] = useState<boolean>(false);
 
-  const { tokenData, tokenError } = useTokenData({
+  const { tokenData, tokenError, isTokenLoading } = useTokenData({
     chainId: SUPPORTED_TOKENS_DATA[selectedToken].chainId,
     symbol: selectedToken,
   });
-  const { tokenPriceData, tokenPriceError } =
+  const { tokenPriceData, tokenPriceError, isTokenPriceLoading } =
     useTokenPriceData({
       chainId: SUPPORTED_TOKENS_DATA[selectedToken].chainId,
       assetTokenAddress: tokenData?.address,
@@ -45,11 +47,11 @@ const TokenSwapCard = ({
 
 
   const tokenAmount = useMemo(() => {
-    if (usdAmount && tokenPriceData?.unitPrice) {
-      return Number(usdAmount) / Number(tokenPriceData?.unitPrice);
+    if (sellUsdAmount && tokenPriceData?.unitPrice) {
+      return Number(sellUsdAmount) / Number(tokenPriceData?.unitPrice);
     }
     return 0;
-  }, [usdAmount, tokenPriceData]);
+  }, [sellUsdAmount, tokenPriceData]);
 
   const handleTokenSelect = (token: SupportedTokens) => {
     setSelectedToken(token);
@@ -62,8 +64,19 @@ const TokenSwapCard = ({
     }
   };
 
+  useEffect(() => {
+    let errorTimeout: NodeJS.Timeout;
+    if (tokenError || tokenPriceError) {
+      setShowError(true);
+      errorTimeout = setTimeout(() => {
+        setShowError(false);
+      }, 5000);
+    }
+    return () => clearTimeout(errorTimeout);
+  }, [tokenError, tokenPriceError]);
+
   return (
-    <Card className={`${type}-card-container w-full lg:w-1/2`}>
+    <Card className={`${type}-card-container w-full py-10 lg:w-1/2`}>
       <CardHeader>
         <CardTitle>
           <div className="flex flex-col gap-2 w-full items-start md:flex-row md:items-center">
@@ -110,7 +123,7 @@ const TokenSwapCard = ({
         <div className="flex flex-col gap-6">
           <div className="token-amount-container">
             <div className="flex flex-col gap-2">
-              <span className="text-sm">${usdAmount || 0}</span>
+              <span className="text-sm">${sellUsdAmount || 0}</span>
             </div>
             <div className="flex flex-col gap-2 text-xl font-bold">
               <span className="h-2rem">
@@ -122,14 +135,14 @@ const TokenSwapCard = ({
               </span>
             </div>
             <div className="flex flex-col h-0">
-              {tokenError && (
-                <span className="text-sm text-red-500">
-                  Error fetching token data.
+              {showError && (
+                <span className="text-xs text-red-500 animate-pulse">
+                  Error occured. Please try again later.
                 </span>
               )}
-              {tokenPriceError && (
-                <span className="text-sm text-red-500">
-                  Error fetching token price data.
+              {!showError && (isTokenLoading || isTokenPriceLoading) && (
+                <span className="text-xs text-gray-500 animate-pulse fade-in">
+                  Loading...
                 </span>
               )}
             </div>
