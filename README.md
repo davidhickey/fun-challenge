@@ -17,6 +17,7 @@ A modern web application for token swapping built with Next.js, React, and TypeS
  - create a button that reverses the sell and buy tokens
  - use a library for crypto currency icons
  - implement logic that factors in cost of gas for the swap
+  - implement a light and dark mode toggle
 
 
 ## Features
